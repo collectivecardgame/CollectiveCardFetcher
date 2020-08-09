@@ -350,5 +350,6 @@ async def on_reaction_add(reaction, user):
     if reaction.emoji == '👎' and reaction.message.author == bot.user:
         await bot.delete_message(reaction.message)
 
+print(os.environ.get('BOT_TOKEN'))
 
 bot.run(os.environ.get('BOT_TOKEN'))
