@@ -5,9 +5,13 @@ from PIL import Image
 from discord.ext import commands
 import re, os, io
 
+print(1)
+
 # global variables
 bot = commands.Bot(command_prefix="!")
 collective_sub = reddit.CollectiveSub()
+
+print(2)
 
 # database connections
 try:
@@ -18,6 +22,8 @@ try:
 except:
     print("db off")
  
+print(3)
+
 # This is the fetcher dict. when a search modifier is specified,
 # the bot looks here for the right fetcher to use.
 # if you are extending this bot, add your fetcher through here.
@@ -35,6 +41,8 @@ card_fetchers = {
     "ygo": fetcher.ygo.YugiohFetcher(),
     'hs': fetcher.hs.HsFetcher()
 }
+
+print(4)
 
 # editing the "!help" command, to actually become... helpful :P 
 embed = discord.Embed(title="CollectiveCardFetcher Help", description="here is a list of commands for the bot:", color=0x00FFFF)
@@ -116,12 +124,13 @@ def is_admin(user_id):
 
 @bot.command()
 async def alive():
+    print('alive')
     await bot.say('im alive and well!')
 
 
 @bot.command()
 async def server():
-    await bot.say('https://discordapp.com/api/oauth2/authorize?client_id=465866501715525633&permissions=522304&scope=bot')
+    await bot.say('https://discordapp.com/api/oauth2/authorize?client_id=741946462497406989&permissions=522304&scope=bot')
 
 
 @bot.command()
