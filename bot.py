@@ -138,7 +138,7 @@ async def server(ctx):
 
 @bot.command()
 async def github(ctx):
-    await ctx.send('https://github.com/fireasembler/CollectiveCardFetcher')
+    await ctx.send('https://github.com/collectivecardgame/CollectiveCardFetcher')
 
 
 @bot.command(pass_context=True)
