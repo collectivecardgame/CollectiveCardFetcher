@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker-compose build --build-arg REDDIT_CLIENT_ID=asdf --build-arg REDDIT_SECRET=asdf --build-arg DISCORD_BOT_TOKEN=asdf fetcher
+docker-compose up -d
