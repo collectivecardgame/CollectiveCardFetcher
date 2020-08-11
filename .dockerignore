@@ -1,4 +1,8 @@
+venv
 .vscode/*
 .venv/*
 __pycache__
-dev-start.ps1
+*.md
+*.sh
+Procfile
+.git*

@@ -4,6 +4,9 @@ import discord, requests
 from PIL import Image
 from discord.ext import commands
 import re, os, io
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 print(1)
 
@@ -123,50 +126,50 @@ def is_admin(user_id):
 # commands
 
 @bot.command()
-async def alive():
+async def alive(ctx):
     print('alive')
-    await bot.say('im alive and well!')
+    await ctx.send('im alive and well!')
 
 
 @bot.command()
-async def server():
-    await bot.say('https://discordapp.com/api/oauth2/authorize?client_id=741946462497406989&permissions=522304&scope=bot')
+async def server(ctx):
+    await ctx.send('https://discordapp.com/api/oauth2/authorize?client_id=741946462497406989&permissions=522304&scope=bot')
 
 
 @bot.command()
-async def github():
-    await bot.say('https://github.com/fireasembler/CollectiveCardFetcher')
+async def github(ctx):
+    await ctx.send('https://github.com/fireasembler/CollectiveCardFetcher')
 
 
 @bot.command(pass_context=True)
-async def nice(ctx):
+async def nice(ctxctx):
     await bot.send_file(ctx.message.channel, 'images/nice_art.jpg')
 
 
 @bot.command()
-async def good():
+async def good(ctx):
     os.environ['GOOD'] = str(int(os.environ['GOOD']) + 1)
-    await bot.say('thank you! :)')
+    await ctx.send('thank you! :)')
 
 
 @bot.command()
-async def bad():
+async def bad(ctx):
     os.environ['BAD'] = str(int(os.environ['BAD']) + 1)
-    await bot.say('ill try better next time :(')
+    await ctx.send('ill try better next time :(')
 
 
 @bot.command()
-async def score():
-    await bot.say('good: ' + os.environ.get('GOOD'))
-    await bot.say('bad: ' + os.environ.get('BAD'))
+async def score(ctx):
+    await ctx.send('good: ' + os.environ.get('GOOD'))
+    await ctx.send('bad: ' + os.environ.get('BAD'))
 
 
 @bot.command()
-async def new(link): 
+async def new(ctx, link):
     if link in new_command_table:
-        await bot.say(new_command_table[link].replace(r"\n", "\n"))
+        await ctx.send(new_command_table[link].replace(r"\n", "\n"))
     else:
-        await bot.say("{} isnt a link I can give. the current links are: {}".format(
+        await ctx.send("{} isnt a link I can give. the current links are: {}".format(
             link,
             ','.join(new_command_table.get_all_keys())
             ))
@@ -181,17 +184,17 @@ async def image(ctx, link):
             for prop in card_data['card']['Text']['Properties']:
                 if prop['Symbol']['Name'] == 'PortraitUrl':
                     img = requests.get(prop['Expression']['Value']).content
-                    await bot.send_file(ctx.message.channel, io.BytesIO(img), filename='card.png')
+                    await ctx.message.channel.send(io.BytesIO(img), filename='card.png')
         else:
-            await bot.say('sorry, card was not found')
+            await ctx.send('sorry, card was not found')
     else:
-        await bot.say('sorry, but this isnt a link!')
+        await ctx.send('sorry, but this isnt a link!')
 
 
 # this was done by OWN3D
 # thank you very much! ^^
 @bot.command(pass_context=True)
-async def concat(ctx,*args):
+async def concat(ctx, *args):
     ori_card, link = args
     if link.startswith('https://files.collective.gg/p/cards/'):
         try:
@@ -220,25 +223,25 @@ async def concat(ctx,*args):
             new_im.save("trash/update.png", "png")
             await bot.send_file(ctx.message.channel, "trash/update.png", filename="update.png")
         except Exception as e:
-            await bot.say('card not found!')
+            await ctx.send('card not found!')
             raise e
     else:
-        await bot.say('sorry, but this isnt a link!')
+        await ctx.send('sorry, but this isnt a link!')
 
 
 @bot.command(pass_context=True)
 async def meme(ctx, link):
     if link == 'list':
-        await bot.say(', '.join(memes_table.get_all_keys()))
+        await ctx.send(', '.join(memes_table.get_all_keys()))
         return
     if link in memes_table:
         await bot.send_file(ctx.message.channel, io.BytesIO(memes_table[link]), filename="meme.png")
     else:
-        await bot.say("couldn't find {}".format(link))
+        await ctx.send("couldn't find {}".format(link))
 
 
 @bot.command()
-async def leaderboard():
+async def leaderboard(ctx):
     leaderboard = discord.Embed(title="leaderboard", color=0x00FFFF)
     for spot in requests.get('https://server.collective.gg/api/public/leaderboards').json()['multi']:
         leaderboard.add_field(
@@ -252,67 +255,67 @@ async def leaderboard():
             inline=False
         )
     
-    await bot.say(embed=leaderboard)
+    await ctx.send(embed=leaderboard)
 
 @bot.command()
-async def code():
-    await bot.say("C word alert! The word you are looking for is **blocks**.")
+async def code(ctx):
+    await ctx.send("C word alert! The word you are looking for is **blocks**.")
 
 
 # dev/admin commands
 def get_admin(ctx:discord.ext.commands.Context) -> discord.Role:
     '''returns the card fetcher admin role of the server'''
     user = ctx.message.author
-    return discord.utils.get(user.server.roles, name = os.environ.get("MOD_ROLE"))
+    return discord.utils.get(user.guild.roles, name = os.environ.get("MOD_ROLE"))
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def say(ctx):
-    if ctx.message.author.id == '223876086994436097':
+    if ctx.message.author.id == 223876086994436097:
         await bot.delete_message(ctx.message)
-        await bot.say(' '.join(ctx.message.content.split(' ')[1:]))
+        await ctx.send(' '.join(ctx.message.content.split(' ')[1:]))
     else:
-        await bot.say('YOU CANT CONTROL ME!!!!!!')
+        await ctx.send('YOU CANT CONTROL ME!!!!!!')
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def update(ctx):
     for fetcher in card_fetchers:
         fetcher.__init__()
-    await bot.say('done updating the cards!')
+    await ctx.send('done updating the cards!')
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def add(ctx, *args):
     if is_admin(ctx.message.author.id):
         if args[0] == "meme":
             if len(args) == 1:
-                await bot.say("you haven't specified a name for the meme!")
+                await ctx.send("you haven't specified a name for the meme!")
             else:
                 meme = requests.get(ctx.message.attachments[0]['url']).content
                 memes_table[args[1]] = meme
-                await bot.say("{} has been added!".format(args[1]))
+                await ctx.send("{} has been added!".format(args[1]))
         else:
             new_command[args[0]] = ' '.join(args[1:])
-            await bot.say("{} has been added!".format(args[0]))
+            await ctx.send("{} has been added!".format(args[0]))
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def remove(ctx, *args):
     if is_admin(ctx.message.author.id):
         if args[0] == "meme":
             if len(args) == 1:
-                await bot.say("you haven't specified a name for the meme!")
+                await ctx.send("you haven't specified a name for the meme!")
             memes_table.remove(args[1])
-            await bot.say("{} has been removed!".format(args[1]))
+            await ctx.send("{} has been removed!".format(args[1]))
         else:
             new_command_table.remove(args[0])
-            await bot.say("{} has been removed!".format(args[0]))
+            await ctx.send("{} has been removed!".format(args[0]))
 
 
 @bot.command()
-async def help():
-    await bot.say(embed=embed)
+async def help(ctx):
+    await ctx.send(embed=embed)
 
 
 # events 
@@ -338,7 +341,7 @@ async def on_message(message):
         # this loops runs one time plus once for every five links
         # since discord can only display five pictures per message
         for x in range((len(links)//5)+1):
-            await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
+            await message.channel.send('\n'.join(links[5*x:5*(x+1)]))
     await bot.process_commands(message)
 
 
